@@ -1,5 +1,6 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const moment = require('moment');
 
 request('http://tourfresk.com/plans/', (error, response, html) => {
   if (error) {
@@ -8,6 +9,7 @@ request('http://tourfresk.com/plans/', (error, response, html) => {
 
   const $ = cheerio.load(html);
   const appartments = [];
+  const since = moment.utc();
   $('.noUnites').each(function () {
     const node = $(this);
     const nodes = node.find('h5');
@@ -15,7 +17,7 @@ request('http://tourfresk.com/plans/', (error, response, html) => {
     if (!isReserved) {
       const name = readName(nodes);
       const rent = readRent(nodes);
-      appartments.push({ name, rent });
+      appartments.push({ name, rent, since });
     }
   });
 
