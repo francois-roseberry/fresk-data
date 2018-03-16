@@ -4,7 +4,10 @@ const process = require('process');
 const moment = require('moment');
 const Mailgun = require('mailgun-js');
 
-
+const MAILGUN_API_KEY = process.env.API_KEY;
+const MAILGUN_DOMAIN = process.env.DOMAIN;
+const FROM = 'do.not.reply@fresk-data.com';
+const TO = 'f_roseberry@live.fr';
 
 request('http://tourfresk.com/plans/', (error, response, html) => {
   if (error) {
@@ -26,11 +29,6 @@ request('http://tourfresk.com/plans/', (error, response, html) => {
   });
 
   console.log(appartments);
-
-  const MAILGUN_API_KEY = process.env.API_KEY;
-  const MAILGUN_DOMAIN = process.env.DOMAIN;
-  const FROM = 'do.not.reply@fresk-data.com';
-  const TO = 'f_roseberry@live.fr';
 
   if (MAILGUN_API_KEY && MAILGUN_DOMAIN) {
     sendEmail(appartments);
