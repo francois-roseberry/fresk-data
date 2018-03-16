@@ -19,6 +19,7 @@
   "homepage": "https://github.com/francois-roseberry/fresk-data#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "mailgun-js": "^0.16.0",
     "moment": "^2.21.0",
     "request": "^2.85.0"
   }
