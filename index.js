@@ -57,14 +57,9 @@ const sendEmail = appartments => {
   }
 
   mailgun.messages().send(data, (err, body) => {
-        //If there is an error, render the error page
         if (err) {
             console.log("got an error sending email:", err);
-        }
-        //Else we can greet    and leave
-        else {
-            //Here "submitted.jade" is the view file for this landing page
-            //We pass the variable "email" from the url parameter in an object rendered by Jade
+        } else {
             console.log('sent email');
             console.log(body);
         }
