@@ -19,6 +19,8 @@ request('http://tourfresk.com/plans/', (error, response, html) => {
     }
   });
 
+  appartments.sort(sortByRent);
+
   console.log(appartments);
 });
 
@@ -29,3 +31,5 @@ const readRent = nodes => {
   rentString = monthlyRentString.split('\$')[0].trim().replace(/\s/g, '');
   return parseInt(rentString);
 }
+
+const sortByRent = (a, b) => a.rent - b.rent;
