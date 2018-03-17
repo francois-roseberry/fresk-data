@@ -8,7 +8,7 @@ const FRESK_URL = 'http://tourfresk.com/plans/';
 const MAILGUN_API_KEY = process.env.API_KEY;
 const MAILGUN_DOMAIN = process.env.DOMAIN;
 const FROM = 'do.not.reply@fresk-data.com';
-const TO = 'f_roseberry@live.fr';
+const TO = process.env.TO;
 
 const fetchAppartments = callback => {
   request(FRESK_URL, (error, response, html) => {
@@ -59,7 +59,7 @@ const sendEmail = appartments => {
       if (err) {
           console.log("got an error sending email:", err);
       } else {
-          console.log('sent email');
+          console.log('sent email to', TO);
           console.log(body);
       }
   });
@@ -68,7 +68,9 @@ const sendEmail = appartments => {
 fetchAppartments(appartments => {
   console.log(appartments);
 
-  if (MAILGUN_API_KEY && MAILGUN_DOMAIN) {
+  if (MAILGUN_API_KEY && MAILGUN_DOMAIN && TO) {
     sendEmail(appartments);
+  } else {
+    console.log('did not send email because either no mailgun credentials or destination addresses were specified');
   }
 });
