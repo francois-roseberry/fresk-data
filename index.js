@@ -25,22 +25,28 @@ const fetchAppartments = callback => {
       const isReserved = nodes.eq(0).text() == 'UNITÉ RÉSERVÉE';
       if (!isReserved) {
         const name = readName(nodes);
-        const rent = readRent(nodes);
-        appartments.push({ name, rent, since });
+        const rentString = readRentString(nodes);
+        const rent = toRent(rentString);
+        appartments.push({ name, rentString, rent, since });
       }
     });
 
+    appartments.sort(sortByRent);
     callback(appartments);
   });
 }
 
 const readName = nodes => nodes.eq(0).children().eq(0).text();
 
-const readRent = nodes => nodes.eq(3).children().eq(0).text();
+const readRentString = nodes => nodes.eq(3).children().eq(0).text();
+
+const toRent = renString => parseInt(rentString.split('\$')[0].trim().replace(/\s/g, ''));
+
+const sortByRent = (a, b) => b.rent - a.rent;
 
 const appartmentMessage = appartments => {
   let message = '<table><thead><td>Nom</td><td>Loyer</td></thead><tbody>';
-  message += appartments.map(appartment => '<tr><td>' + appartment.name + '</td><td>' + appartment.rent + '</td></tr>').join('');
+  message += appartments.map(appartment => '<tr><td>' + appartment.name + '</td><td>' + appartment.rentString + '</td></tr>').join('');
   message += '</tbody></table>'
   return message;
 };
