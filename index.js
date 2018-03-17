@@ -1,7 +1,7 @@
 const request = require('request');
 const cheerio = require('cheerio');
 const process = require('process');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const Mailgun = require('mailgun-js');
 
 const FRESK_URL = 'http://tourfresk.com/plans/';
@@ -18,7 +18,7 @@ const fetchAppartments = callback => {
 
     const $ = cheerio.load(html);
     const appartments = [];
-    const since = moment.utc();
+    const timeString = moment().tz('America/Toronto').format('DD MMMM YYYY, h:mm');
     $('.noUnites').each(function () {
       const node = $(this);
       const nodes = node.find('h5');
@@ -27,12 +27,12 @@ const fetchAppartments = callback => {
         const name = readName(nodes);
         const rentString = readRentString(nodes);
         const rent = toRent(rentString);
-        appartments.push({ name, rentString, rent, since });
+        appartments.push({ name, rentString, rent });
       }
     });
 
     appartments.sort(sortByRent);
-    callback(appartments);
+    callback(timeString, appartments);
   });
 }
 
@@ -40,25 +40,25 @@ const readName = nodes => nodes.eq(0).children().eq(0).text();
 
 const readRentString = nodes => nodes.eq(3).children().eq(0).text();
 
-const toRent = renString => parseInt(rentString.split('\$')[0].trim().replace(/\s/g, ''));
+const toRent = rentString => parseInt(rentString.split('\$')[0].trim().replace(/\s/g, ''));
 
-const sortByRent = (a, b) => b.rent - a.rent;
+const sortByRent = (a, b) => a.rent - b.rent;
 
-const appartmentMessage = appartments => {
-  let message = '<table><thead><td>Nom</td><td>Loyer</td></thead><tbody>';
+const appartmentMessage = (timeString, appartments) => {
+  let message = timeString + '<br/><br/><table><thead><td>Nom</td><td>Loyer</td></thead><tbody>';
   message += appartments.map(appartment => '<tr><td>' + appartment.name + '</td><td>' + appartment.rentString + '</td></tr>').join('');
   message += '</tbody></table>'
   return message;
 };
 
-const sendEmail = appartments => {
+const sendEmail = (timeString, appartments) => {
   const mailgun = new Mailgun({ apiKey: MAILGUN_API_KEY, domain: MAILGUN_DOMAIN });
 
   const data = {
     from: FROM,
     to: TO,
     subject: 'Appartements disponibles dans la tour Fresk',
-    html: appartmentMessage(appartments)
+    html: appartmentMessage(timeString, appartments)
   }
 
   mailgun.messages().send(data, (err, body) => {
@@ -71,11 +71,12 @@ const sendEmail = appartments => {
   });
 };
 
-fetchAppartments(appartments => {
+fetchAppartments((timeString, appartments) => {
+  console.log('Fetched at :', timeString);
   console.log(appartments);
 
   if (MAILGUN_API_KEY && MAILGUN_DOMAIN && TO) {
-    sendEmail(appartments);
+    sendEmail(timeString, appartments);
   } else {
     console.log('did not send email because either no mailgun credentials or destination addresses were specified');
   }

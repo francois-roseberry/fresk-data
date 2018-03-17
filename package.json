@@ -21,6 +21,7 @@
     "cheerio": "^1.0.0-rc.2",
     "mailgun-js": "^0.16.0",
     "moment": "^2.21.0",
+    "moment-timezone": "^0.5.14",
     "request": "^2.85.0"
   },
   "engines": {
