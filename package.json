@@ -22,5 +22,8 @@
     "mailgun-js": "^0.16.0",
     "moment": "^2.21.0",
     "request": "^2.85.0"
+  },
+  "engines": {
+    "node": "8.9.1"
   }
 }
